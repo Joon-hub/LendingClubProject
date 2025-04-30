@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Lending Club Project
 
 ## Project Overview
@@ -237,6 +236,3 @@ The scores are stored in Parquet format for efficient storage and querying. Each
 6. Add data lineage tracking
 7. Implement automated data quality monitoring
 8. Add performance optimization features
-=======
-# LendingClubProject
->>>>>>> df04cc6233de58d2aa14d281a771290dfc2132b6
