@@ -9,7 +9,7 @@ This module handles the cleaning and transformation of the Lending Club datasets
 import os
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import current_timestamp, regexp_replace, col, when
-
+# -------------------------------------------------------------------------------------
 def create_spark_session():
     """Create and return a Spark session configured for local processing."""
     return SparkSession.builder \
@@ -17,7 +17,7 @@ def create_spark_session():
         .master('local[*]') \
         .config("spark.driver.memory", "4g") \
         .getOrCreate()
-
+# -------------------------------------------------------------------------------------
 def clean_customers_data(spark, input_path, output_path):
     """Clean and transform customer data."""
     # Define schema
@@ -92,7 +92,7 @@ def clean_customers_data(spark, input_path, output_path):
         .save(os.path.join(output_path, "customers_csv"))
     
     return customers_df
-
+# -------------------------------------------------------------------------------------
 def clean_loans_data(spark, input_path, output_path):
     """Clean and transform loan data."""
     # Define schema
@@ -125,9 +125,12 @@ def clean_loans_data(spark, input_path, output_path):
         "loan_amount", "funded_amount", "loan_term_months",
         "monthly_installment", "issue_date", "loan_status", "loan_purpose"
     ]
+    # Drop rows from loans_df where any of the critical columns have null (missing) values
     loans_df = loans_df.na.drop(subset=critical_columns)
     
-    # Clean loan term
+    # Clean the 'loan_term_months' column by remvoing all non-digit charachters (e.g. 'months', spaces)
+    # Convert the cleaned string into integer and calculate loan terms in year
+    # Drop the original 'loan_term_months' column as it's no longer needed
     loans_df = loans_df \
         .withColumn("loan_term_months", regexp_replace(col("loan_term_months"), "\D", "")) \
         .withColumn("loan_term_years", col("loan_term_months").cast("int")/12) \
@@ -140,6 +143,8 @@ def clean_loans_data(spark, input_path, output_path):
         "car", "vacation", "moving", "house", "wedding", "renewable_energy", 
         "educational"
     ]
+    # Standerdize the 'loan_purpose' column by keeping only main purposes:
+    # if the value is not predefines list, categorize it as "other"
     loans_df = loans_df \
         .withColumn("loan_purpose", 
                    when(col("loan_purpose").isin(main_purposes), col("loan_purpose"))
@@ -158,7 +163,7 @@ def clean_loans_data(spark, input_path, output_path):
         .save(os.path.join(output_path, "loans_csv"))
     
     return loans_df
-
+# -------------------------------------------------------------------------------------
 def clean_repayments_data(spark, input_path, output_path):
     """Clean and transform repayment data."""
     # Define schema
@@ -194,6 +199,11 @@ def clean_repayments_data(spark, input_path, output_path):
     repayments_df = repayments_df.na.drop(subset=critical_columns)
     
     # Fix payment anomalies
+    
+    # Fix payment anomalies where total_payment_received received is zero despite receiving principal.
+    # If total_priciple_received is non-zero but total_payment received is incorrectly recorded as zero
+    # recalculate total_paymennt_received as the sum of principal, interest and late fees.
+
     repayments_df = repayments_df.withColumn(
         "total_payment_received",
         when(
@@ -230,7 +240,7 @@ def clean_repayments_data(spark, input_path, output_path):
         .save(os.path.join(output_path, "repayments_csv"))
     
     return repayments_df
-
+# -------------------------------------------------------------------------------------
 def clean_defaulters_data(spark, input_path, output_path):
     """Clean and transform defaulters data."""
     # Define schema
@@ -284,6 +294,8 @@ def clean_defaulters_data(spark, input_path, output_path):
     
     return primary_defaulters_df, credit_issues_df
 
+
+# -------------------------------------------------------------------------------------
 def clean_all_data(input_base_path, output_base_path):
     """Clean all datasets."""
     spark = create_spark_session()
