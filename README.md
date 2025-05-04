@@ -1,238 +1,156 @@
-# Lending Club Project
-
-## Project Overview
-This project implements a comprehensive loan scoring system for Lending Club, a peer-to-peer lending platform. The system analyzes various aspects of loan applications and borrower profiles to calculate risk scores and assign loan grades.
-
-## Project Structure
-```
+Lending Club Project
+Project Overview
+As a master’s student studying data engineering, I developed this project to build a loan scoring system for Lending Club, a peer-to-peer lending platform. The system analyzes loan applications and borrower profiles to compute risk scores and assign loan grades. Working on this project helped me apply data engineering concepts to a practical problem, and I aimed to create a clear, functional pipeline.
+Project Structure
+The project is organized as follows:
 LendingClubProject/
-├── src/                                # Source code directory
-│   ├── loan_scorer.py                 # Core loan scoring implementation
+├── src/                                # Source code
+│   ├── loan_scorer.py                 # Core loan scoring logic
 │   ├── utils/                         # Utility functions
 │   │   ├── spark_utils.py             # Spark session management
 │   │   ├── data_utils.py              # Data manipulation helpers
 │   │   └── validation_utils.py        # Data validation functions
 │   └── config/                        # Configuration files
 │       ├── scoring_config.py          # Scoring parameters
-│       └── paths_config.py            # File paths configuration
+│       └── paths_config.py            # File path configurations
 │
-├── tests/                             # Test directory
-│   ├── test_loan_scorer.py            # Loan scorer unit tests
+├── tests/                             # Unit tests
+│   ├── test_loan_scorer.py            # Loan scorer tests
 │   └── test_utils/                    # Utility function tests
 │       ├── test_spark_utils.py
 │       ├── test_data_utils.py
 │       └── test_validation_utils.py
 │
-├── data/                              # Data directory
+├── data/                              # Data storage
 │   ├── raw/                           # Raw input data
 │   └── processed/                     # Processed data
 │
-├── loan_score/                        # Loan score output directory
+├── loan_score/                        # Output directory
 │   ├── daily/                         # Daily score files
 │   ├── monthly/                       # Monthly aggregated scores
 │   └── reports/                       # Score analysis reports
 │
 ├── requirements.txt                   # Python dependencies
 └── README.md                          # Project documentation
-```
 
-## ETL Pipeline Approach
+ETL Pipeline Approach
+1. Data Ingestion Layer
 
-### 1. Data Ingestion Layer
-- **Source Systems**:
-  - Loan Details (`loans`)
-  - Loan Repayments (`loans_repayments`)
-  - Customer Information (`customers_new`)
-  - Defaulters Details (`loans_defaulters_detail_rec_enq_new`)
-  - Delinquency Records (`loans_defaulters_delinq_new`)
-  - Bad Customer Data (`bad_customer_data_final`)
+Sources: Datasets include loan details, repayments, customer information, defaulters, and delinquency records.
+Formats: Input data is in CSV format; output is stored in Parquet for efficiency.
+Quality Checks: Validates schema, handles null values, ensures data type consistency, and detects duplicates.
 
-- **Data Formats**:
-  - Input: CSV/Parquet files
-  - Output: Parquet format for optimized storage and querying
+2. Data Processing Layer
 
-- **Data Quality Checks**:
-  - Schema validation
-  - Null value handling
-  - Data type consistency
-  - Duplicate detection
+Cleaning: Removes duplicates, standardizes formats, handles missing values, and validates data ranges.
+Transformation: Computes derived metrics, applies business rules, and generates scoring components.
 
-### 2. Data Processing Layer
-- **Data Cleaning**:
-  - Handle missing values
-  - Standardize formats
-  - Remove duplicates
-  - Validate data ranges
+3. Data Storage Layer
 
-- **Data Transformation**:
-  - Calculate derived metrics
-  - Apply business rules
-  - Create aggregations
-  - Generate scoring components
+Strategy: Partitions data by date, uses Parquet for optimized storage and querying.
+Access: Supports Spark DataFrame operations and SQL-based querying for batch processing.
 
-### 3. Data Storage Layer
-- **Storage Strategy**:
-  - Partitioned by date
-  - Optimized for query performance
-  - Compressed for storage efficiency
+4. Data Quality Framework
 
-- **Data Access**:
-  - SQL-based querying
-  - Spark DataFrame operations
-  - Batch processing support
+Validation: Ensures completeness, accuracy, and consistency of data.
+Monitoring: Tracks pipeline execution, logs errors, and generates basic data quality reports.
 
-### 4. Data Quality Framework
-- **Validation Rules**:
-  - Completeness checks
-  - Accuracy validation
-  - Consistency verification
-  - Timeliness monitoring
-
-- **Monitoring**:
-  - Pipeline execution tracking
-  - Error logging
-  - Performance metrics
-  - Data quality reports
-
-## Step-by-Step Implementation Guide
-
-### 1. Environment Setup
-```bash
+Implementation Guide
+1. Environment Setup
 # Create and activate virtual environment
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
-```
 
-### 2. Data Preparation
-1. Place raw data files in the `data/raw/` directory
-2. Ensure data files follow the expected schema
-3. Verify data quality using validation scripts
+2. Data Preparation
 
-### 3. Configuration Setup
-1. Update `config/paths_config.py` with your data paths
-2. Modify `config/scoring_config.py` for custom scoring rules
-3. Set up environment variables in `.env` file
+Place raw data files in data/raw/.
+Verify data schema using validation scripts.
+Perform initial data quality checks.
 
-### 4. Running the Pipeline
-```bash
-# Run the complete ETL pipeline
+3. Configuration Setup
+
+Update config/paths_config.py with data paths.
+Adjust config/scoring_config.py for scoring rules if needed.
+Configure environment variables in a .env file.
+
+4. Running the Pipeline
+# Run full ETL pipeline
 python src/loan_scorer.py
 
 # Run specific components
 python src/loan_scorer.py --component payment_history
 python src/loan_scorer.py --component defaulters_history
 python src/loan_scorer.py --component financial_health
-```
 
-### 5. Testing
-```bash
+5. Testing
 # Run all tests
 pytest tests/ -v
 
-# Run specific test categories
+# Run specific tests
 pytest tests/test_loan_scorer.py -v
 pytest tests/test_utils/ -v
-```
 
-### 6. Monitoring and Maintenance
-1. Check logs in `logs/` directory
-2. Review data quality reports
-3. Monitor pipeline performance
-4. Update configurations as needed
+6. Monitoring and Maintenance
 
-## Loan Scoring System
+Review logs in logs/.
+Check data quality reports.
+Monitor pipeline performance and update configurations as needed.
 
-### Scoring Components
-The loan scoring system evaluates three main components:
+Loan Scoring System
+Scoring Components
+The system evaluates three components:
 
-1. **Payment History (20% weight)**
-   - Last payment amount analysis
-   - Total payment received evaluation
-   - Payment consistency assessment
+Payment History (20% weight): Analyzes last payment amount, total payments, and consistency.
+Loan Defaults (45% weight): Assesses delinquency, public records, bankruptcies, and credit inquiries.
+Financial Health (35% weight): Evaluates loan status, home ownership, credit utilization, and grades.
 
-2. **Loan Defaults (45% weight)**
-   - Delinquency history
-   - Public records
-   - Bankruptcy records
-   - Credit inquiries
+Scoring Parameters
 
-3. **Financial Health (35% weight)**
-   - Loan status
-   - Home ownership
-   - Credit limit utilization
-   - Loan grade and sub-grade
+Unacceptable: 0 points
+Very Bad: 100 points
+Bad: 250 points
+Good: 500 points
+Very Good: 650 points
+Excellent: 800 points
 
-### Scoring Parameters
-The system uses the following scoring parameters:
-- Unacceptable: 0 points
-- Very Bad: 100 points
-- Bad: 250 points
-- Good: 500 points
-- Very Good: 650 points
-- Excellent: 800 points
+Grade Assignment
+Grades are assigned based on total score:
 
-### Grade Assignment
-Final grades are assigned based on total scores:
-- A: > 2500 points
-- B: 2000-2500 points
-- C: 1500-2000 points
-- D: 1000-1500 points
-- E: 750-1000 points
-- F: ≤ 750 points
+A: > 2500 points
+B: 2000-2500 points
+C: 1500-2000 points
+D: 1000-1500 points
+E: 750-1000 points
+F: ≤ 750 points
 
-## Implementation Details
+Implementation Details
+LoanScorer Class
+The LoanScorer class contains:
 
-### LoanScorer Class
-The core functionality is implemented in the `LoanScorer` class with the following methods:
+calculate_payment_history_score(): Evaluates payment patterns and amounts.
+calculate_defaulters_history_score(): Processes delinquency and credit records.
+calculate_financial_health_score(): Analyzes financial metrics and loan status.
+calculate_final_loan_score(): Combines scores, applies weights, and assigns grades.
 
-1. `calculate_payment_history_score()`
-   - Evaluates payment patterns
-   - Considers last payment amount relative to monthly installment
-   - Assesses total payment received against funded amount
-
-2. `calculate_defaulters_history_score()`
-   - Analyzes delinquency records
-   - Processes public records and bankruptcies
-   - Evaluates credit inquiries
-
-3. `calculate_financial_health_score()`
-   - Assesses loan status
-   - Evaluates home ownership
-   - Analyzes credit limit utilization
-   - Processes loan grades
-
-4. `calculate_final_loan_score()`
-   - Combines all component scores
-   - Applies respective weights
-   - Assigns final grades
-
-## Output
-The final loan scores and grades are saved in the following directory structure:
-```
+Output
+Scores are saved in loan_score/:
 loan_score/
-├── daily/                             # Daily score files in Parquet format
+├── daily/                             # Daily scores in Parquet
 ├── monthly/                           # Monthly aggregated scores
-└── reports/                           # Score analysis reports
-```
+└── reports/                           # Analysis reports
 
-The scores are stored in Parquet format for efficient storage and querying. Each score file contains:
-- Loan ID
-- Customer ID
-- Score components
-- Final score
-- Assigned grade
-- Timestamp
-- Processing metadata
+Each file includes loan ID, customer ID, score components, final score, grade, timestamp, and metadata.
+Future Enhancements
 
-## Future Enhancements
-1. Implement real-time scoring
-2. Add machine learning models for risk prediction
-3. Create a dashboard for score visualization
-4. Add more sophisticated financial health metrics
-5. Implement automated testing pipeline
-6. Add data lineage tracking
-7. Implement automated data quality monitoring
-8. Add performance optimization features
+Add real-time scoring capabilities.
+Incorporate machine learning for risk prediction.
+Develop a visualization dashboard.
+Include additional financial health metrics.
+Set up automated testing and monitoring.
+Implement data lineage tracking.
+Optimize pipeline performance.
+
+This project was a steep learning curve, but it solidified my understanding of data engineering pipelines. Feedback is welcome as I continue to refine my skills.
