@@ -1,7 +1,7 @@
 # Lending Club Project
 
 ## Project Overview
-As a master’s student studying data engineering, I developed this project to build a loan scoring system for Lending Club, a peer-to-peer lending platform. The system analyzes loan applications and borrower profiles to compute risk scores and assign loan grades. Working on this project helped me apply data engineering concepts to a practical problem, and I aimed to create a clear, functional pipeline.
+As a master’s student studying Big data engineering, I developed this project to build a loan scoring system for Lending Club, a peer-to-peer lending platform. The system analyzes loan applications and borrower profiles to compute risk scores and assign loan grades. Working on this project helped me apply data engineering concepts to a practical problem, and I aimed to create a clear, functional pipeline.
 
 ## Project Structure
 The project is organized as follows:
