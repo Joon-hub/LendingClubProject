@@ -56,14 +56,8 @@ class LoanScorer:
                                      loans_repayments: DataFrame,
                                      loans: DataFrame) -> DataFrame:
         """
-        Calculate payment history score based on last payment amount and total payments.
-        
-        Args:
-            loans_repayments (DataFrame): DataFrame containing loan repayment data
-            loans (DataFrame): DataFrame containing loan data
-            
-        Returns:
-            DataFrame: DataFrame with payment history scores
+            Evaluates payment patterns and amounts.
+            Returns DataFrame with payment history scores.
         """
         try:
             # Join loans and repayments data
@@ -109,13 +103,9 @@ class LoanScorer:
             raise
             
     def calculate_defaulters_history_score(self, defaulters_df: DataFrame) -> DataFrame:
-        """Calculate defaulters history score based on delinquency, public records, and inquiries.
-        
-        Args:
-            defaulters_df: DataFrame containing defaulters information
-            
-        Returns:
-            DataFrame with defaulters history scores
+        """
+            Processes delinquency and credit records.
+            Returns DataFrame with defaulters history scores.
         """
         # Create aliases for the DataFrame to avoid ambiguous references
         df = defaulters_df.alias("df")
@@ -194,14 +184,8 @@ class LoanScorer:
                                        loans: DataFrame,
                                        customers: DataFrame) -> DataFrame:
         """
-        Calculate financial health score based on loan status, home ownership, credit limit, and grade.
-        
-        Args:
-            loans (DataFrame): DataFrame containing loan data
-            customers (DataFrame): DataFrame containing customer data
-            
-        Returns:
-            DataFrame: DataFrame with financial health scores
+        Analyzes financial metrics and loan status.
+        Returns DataFrame with financial health scores.
         """
         try:
             # Join loans and customers data
